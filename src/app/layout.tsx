@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_JP } from "next/font/google";
 import { AuthProvider } from "@/lib/auth-context";
 import "./globals.css";
@@ -15,10 +15,36 @@ const notoSansJP = Noto_Sans_JP({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#3B82F6",
+};
+
 export const metadata: Metadata = {
-  title: "DevClub",
+  title: {
+    default: "DevClub",
+    template: "%s | DevClub",
+  },
   description:
     "サークル向けオンボーディングSaaS - 新入生の成長を加速する学習プラットフォーム",
+  icons: {
+    icon: "/favicon.svg",
+  },
+  openGraph: {
+    title: "DevClub",
+    description:
+      "サークル向けオンボーディングSaaS - 新入生の成長を加速する学習プラットフォーム",
+    siteName: "DevClub",
+    locale: "ja_JP",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "DevClub",
+    description:
+      "サークル向けオンボーディングSaaS - 新入生の成長を加速する学習プラットフォーム",
+  },
 };
 
 export default function RootLayout({
