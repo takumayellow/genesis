@@ -60,12 +60,20 @@ export default function AdminDashboard() {
         <div className="mx-auto max-w-3xl">
           <div className="mb-6 flex items-center justify-between">
             <h1 className="text-xl font-bold text-black">メンバー進捗管理</h1>
-            <Link
-              href={`/${projectId}/admin/new`}
-              className="rounded bg-blue-500 px-4 py-2 text-sm font-bold text-white hover:bg-blue-600 transition-colors"
-            >
-              タスクを生成
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/${projectId}/admin/onboarding`}
+                className="rounded border border-blue-500 px-4 py-2 text-sm font-bold text-blue-500 hover:bg-blue-50 transition-colors"
+              >
+                オンボ資料を編集
+              </Link>
+              <Link
+                href={`/${projectId}/admin/new`}
+                className="rounded bg-blue-500 px-4 py-2 text-sm font-bold text-white hover:bg-blue-600 transition-colors"
+              >
+                タスクを生成
+              </Link>
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">
