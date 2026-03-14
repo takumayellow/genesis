@@ -8,7 +8,8 @@ import { useAuth } from "@/lib/auth-context";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { TaskDetail } from "@/components/task-detail";
-import type { Task, TaskStep } from "@/lib/types";
+import { isDemoMode, getDemoTask } from "@/lib/demo-mode";
+import type { Task } from "@/lib/types";
 
 export default function TaskPage() {
   const params = useParams();
@@ -20,10 +21,20 @@ export default function TaskPage() {
 
   const projectId = params.project as string;
   const taskId = params.taskId as string;
+  const demoMode = isDemoMode();
 
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/login");
+      return;
+    }
+
+    if (demoMode) {
+      const demoTask = getDemoTask(taskId);
+      if (demoTask) {
+        setTask({ ...demoTask, projectId });
+      }
+      setLoading(false);
       return;
     }
 
@@ -34,8 +45,8 @@ export default function TaskPage() {
           setTask({ id: taskDoc.id, ...taskDoc.data() } as Task);
         }
       } catch {
-        // Task not found - use demo data
-        setTask(createDemoTask(taskId, projectId));
+        // Task not found - use fallback demo data
+        setTask(createFallbackTask(taskId, projectId));
       }
       setLoading(false);
     };
@@ -43,7 +54,7 @@ export default function TaskPage() {
     if (!authLoading) {
       fetchTask();
     }
-  }, [taskId, projectId, user, authLoading, router]);
+  }, [taskId, projectId, user, authLoading, router, demoMode]);
 
   const handleToggleCompletion = useCallback(
     async (stepId: string) => {
@@ -56,13 +67,17 @@ export default function TaskPage() {
       const updatedTask = { ...task, steps: updatedSteps };
       setTask(updatedTask);
 
+      if (demoMode) {
+        return;
+      }
+
       try {
         await updateDoc(doc(db, "tasks", task.id), { steps: updatedSteps });
       } catch {
         // Firestore update failed, keep local state
       }
     },
-    [task]
+    [task, demoMode]
   );
 
   const handleStepClick = useCallback((stepId: string) => {
@@ -124,7 +139,7 @@ export default function TaskPage() {
   );
 }
 
-function createDemoTask(taskId: string, projectId: string): Task {
+function createFallbackTask(taskId: string, projectId: string): Task {
   return {
     id: taskId,
     projectId,

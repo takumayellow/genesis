@@ -6,6 +6,7 @@ import { Header } from "@/components/header";
 import { useEffect } from "react";
 import Link from "next/link";
 import { CheckCircle, Clock, ArrowRight } from "lucide-react";
+import { isDemoMode, getDemoTasks } from "@/lib/demo-mode";
 
 export default function ProjectDashboard() {
   const params = useParams();
@@ -21,38 +22,51 @@ export default function ProjectDashboard() {
 
   if (loading || !user) return null;
 
-  const demoTasks = [
-    {
-      id: "task-1",
-      title: "環境構築",
-      progress: 100,
-      status: "completed" as const,
-    },
-    {
-      id: "task-2",
-      title: "Gitの基本操作",
-      progress: 100,
-      status: "completed" as const,
-    },
-    {
-      id: "task-3",
-      title: "Reactコンポーネント入門",
-      progress: 80,
-      status: "published" as const,
-    },
-    {
-      id: "task-4",
-      title: "LPのヘッダー作成",
-      progress: 40,
-      status: "published" as const,
-    },
-    {
-      id: "task-5",
-      title: "フッターの実装",
-      progress: 0,
-      status: "draft" as const,
-    },
-  ];
+  const tasks = isDemoMode()
+    ? getDemoTasks().map((task) => {
+        const completedSteps = task.steps.filter((s) => s.completed).length;
+        const progress = Math.round(
+          (completedSteps / task.steps.length) * 100
+        );
+        return {
+          id: task.id,
+          title: task.title,
+          progress,
+          status: task.status,
+        };
+      })
+    : [
+        {
+          id: "task-1",
+          title: "環境構築",
+          progress: 100,
+          status: "completed" as const,
+        },
+        {
+          id: "task-2",
+          title: "Gitの基本操作",
+          progress: 100,
+          status: "completed" as const,
+        },
+        {
+          id: "task-3",
+          title: "Reactコンポーネント入門",
+          progress: 80,
+          status: "published" as const,
+        },
+        {
+          id: "task-4",
+          title: "LPのヘッダー作成",
+          progress: 40,
+          status: "published" as const,
+        },
+        {
+          id: "task-5",
+          title: "フッターの実装",
+          progress: 0,
+          status: "draft" as const,
+        },
+      ];
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
@@ -70,7 +84,7 @@ export default function ProjectDashboard() {
           </div>
 
           <div className="flex flex-col gap-3">
-            {demoTasks.map((task) => (
+            {tasks.map((task) => (
               <Link
                 key={task.id}
                 href={`/${projectId}/tasks/${task.id}`}

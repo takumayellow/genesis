@@ -10,6 +10,7 @@ import {
 import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase";
+import { isDemoMode, getDemoUser } from "@/lib/demo-mode";
 import type { User } from "@/lib/types";
 
 interface AuthContextValue {
@@ -30,6 +31,14 @@ export function AuthProvider({ children }: { readonly children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isDemoMode()) {
+      const timer = setTimeout(() => {
+        setUser(getDemoUser());
+        setLoading(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+
     const auth = getFirebaseAuth();
     const db = getFirebaseDb();
 
