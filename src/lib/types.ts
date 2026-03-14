@@ -40,7 +40,7 @@ export interface Activity {
   readonly id: string;
   readonly projectId: string;
   readonly userId: string;
-  readonly type: "step_complete" | "task_complete" | "push" | "review";
+  readonly type: "step_complete" | "task_complete" | "push" | "review" | "join";
   readonly message: string;
   readonly createdAt: Date;
 }

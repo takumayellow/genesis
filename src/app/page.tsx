@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { Header } from "@/components/header";
 import { Folder, Users, Activity } from "lucide-react";
 import Link from "next/link";
+import { ActivityFeedCard } from "@/components/activity-feed-card";
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
@@ -81,6 +82,10 @@ export default function DashboardPage() {
             >
               プロジェクトを作成
             </Link>
+          </div>
+
+          <div className="mt-8">
+            <ActivityFeedCard projectId="" />
           </div>
         </div>
       </main>
