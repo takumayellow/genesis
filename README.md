@@ -22,7 +22,7 @@
 
 | ダッシュボード | タスク実行 | 管理者画面 |
 |:-:|:-:|:-:|
-| ![Dashboard](docs/screenshots/dashboard.png) | ![Task](docs/screenshots/task.png) | ![Admin](docs/screenshots/admin.png) |
+| （近日追加予定） | （近日追加予定） | （近日追加予定） |
 
 ---
 
@@ -34,7 +34,9 @@
 - npm 10 以上
 - Firebase プロジェクト（Authentication + Firestore を有効化）
 - Google AI Studio の Gemini API キー
-- GitHub Personal Access Token
+- GitHub Personal Access Token（`GITHUB_TOKEN`）
+  - GitHub Issues の読み取りに使用します。
+  - 必要なスコープ: プライベートリポジトリの場合は `repo`、パブリックリポジトリのみの場合は `public_repo`。
 
 ### インストール
 
@@ -139,7 +141,7 @@ npm run start
 
 - コミットメッセージは [Conventional Commits](https://www.conventionalcommits.org/) に準拠
 - PR 作成前に `npm run lint` と `npx tsc --noEmit` がパスすることを確認
-- CI（GitHub Actions）が全てグリーンであることを確認してからマージ
+- ワークフロー追加後に CI（GitHub Actions）が全てグリーンであることを確認してからマージ
 
 ### ブランチ命名規則
 
@@ -155,4 +157,6 @@ npm run start
 
 ## ライセンス
 
-このプロジェクトはハッカソン用のプロトタイプです。
+MIT License
+
+このプロジェクトはハッカソン用のプロトタイプとして MIT ライセンスのもとで公開されています。
