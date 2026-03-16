@@ -11,7 +11,7 @@ interface RichStep {
   答え: string;
 }
 
-interface RichTaskData {
+export interface RichTaskData {
   issueUrl?: string;
   目的?: string;
   説明?: string;
@@ -39,46 +39,56 @@ function AccordionStep({
 }) {
   const [expanded, setExpanded] = useState(false);
 
+  const checkboxId = legacyStep ? `step-check-${legacyStep.id}` : undefined;
+
   return (
     <div className="rounded border border-gray-200 bg-white overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
-      >
-        {legacyStep && onToggle ? (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggle(legacyStep.id);
-            }}
-            className={`flex size-5 shrink-0 items-center justify-center rounded border transition-colors ${
-              legacyStep.completed
-                ? "border-transparent bg-blue-500"
-                : "border-gray-300 bg-white hover:border-blue-300"
-            }`}
-          >
-            {legacyStep.completed && (
-              <Check className="size-3 text-white" strokeWidth={3} />
-            )}
-          </button>
+      <div className="flex w-full items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+        {legacyStep && onToggle && checkboxId ? (
+          <>
+            <input
+              type="checkbox"
+              id={checkboxId}
+              checked={legacyStep.completed}
+              onChange={() => onToggle(legacyStep.id)}
+              className="sr-only"
+            />
+            <label
+              htmlFor={checkboxId}
+              className={`flex size-5 shrink-0 cursor-pointer items-center justify-center rounded border transition-colors ${
+                legacyStep.completed
+                  ? "border-transparent bg-blue-500"
+                  : "border-gray-300 bg-white hover:border-blue-300"
+              }`}
+            >
+              {legacyStep.completed && (
+                <Check className="size-3 text-white" strokeWidth={3} />
+              )}
+            </label>
+          </>
         ) : (
           <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600">
             {index + 1}
           </span>
         )}
-        <span
-          className={`flex-1 text-sm font-medium ${
-            legacyStep?.completed ? "text-gray-400 line-through" : "text-black"
-          }`}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex flex-1 items-center justify-between text-left"
         >
-          {step.やること}
-        </span>
-        {expanded ? (
-          <ChevronUp className="size-4 shrink-0 text-gray-400" />
-        ) : (
-          <ChevronDown className="size-4 shrink-0 text-gray-400" />
-        )}
-      </button>
+          <span
+            className={`flex-1 text-sm font-medium ${
+              legacyStep?.completed ? "text-gray-400 line-through" : "text-black"
+            }`}
+          >
+            {step.やること}
+          </span>
+          {expanded ? (
+            <ChevronUp className="size-4 shrink-0 text-gray-400" />
+          ) : (
+            <ChevronDown className="size-4 shrink-0 text-gray-400" />
+          )}
+        </button>
+      </div>
 
       {expanded && (
         <div className="border-t border-gray-100 px-4 py-4 flex flex-col gap-4">
@@ -87,15 +97,21 @@ function AccordionStep({
               <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                 公式教材
               </span>
-              <a
-                href={step.公式教材のリンク}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs text-blue-500 hover:underline break-all"
-              >
-                {step.公式教材のリンク}
-                <ExternalLink className="size-3 shrink-0" />
-              </a>
+              {/^https?:\/\//.test(step.公式教材のリンク) ? (
+                <a
+                  href={step.公式教材のリンク}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs text-blue-500 hover:underline break-all"
+                >
+                  {step.公式教材のリンク}
+                  <ExternalLink className="size-3 shrink-0" />
+                </a>
+              ) : (
+                <span className="text-xs text-gray-500 break-all">
+                  {step.公式教材のリンク}
+                </span>
+              )}
             </div>
           )}
           <div className="flex flex-col gap-1">
@@ -124,8 +140,12 @@ export function RichTaskView({
   onToggleCompletion,
 }: RichTaskViewProps) {
   const steps = richData.ステップ ?? [];
-  const completedCount = task.steps.filter((s) => s.completed).length;
-  const totalCount = task.steps.length;
+  // Use richData.ステップ as the source of truth for total count to avoid
+  // mismatch when task.steps (legacy) and richData.ステップ differ in length.
+  const totalCount = steps.length > 0 ? steps.length : task.steps.length;
+  const completedCount = task.steps
+    .slice(0, totalCount)
+    .filter((s) => s.completed).length;
   const progressPercent =
     totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
@@ -210,10 +230,13 @@ export function RichTaskView({
             ステップ ({steps.length})
           </span>
           {steps.map((step, index) => {
+            // legacyStep is matched by position (index) because richData.ステップ
+            // has no stable ID. If a stable ID becomes available in the future,
+            // replace this with an ID-based lookup for reliable mapping.
             const legacyStep = task.steps[index];
             return (
               <AccordionStep
-                key={index}
+                key={legacyStep?.id ?? index}
                 step={step}
                 index={index}
                 legacyStep={legacyStep ? { id: legacyStep.id, completed: legacyStep.completed } : undefined}

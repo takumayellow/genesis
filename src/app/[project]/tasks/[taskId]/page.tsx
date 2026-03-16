@@ -11,20 +11,7 @@ import { TaskDetail } from "@/components/task-detail";
 import { isDemoMode, getDemoTask } from "@/lib/demo-mode";
 import type { Task } from "@/lib/types";
 import { RichTaskView } from "@/components/rich-task-view";
-
-interface RichTaskData {
-  issueUrl?: string;
-  目的?: string;
-  説明?: string;
-  必要な知識?: string;
-  ロードマップ?: string;
-  ステップ?: {
-    やること: string;
-    公式教材のリンク: string;
-    ヘルプ: string;
-    答え: string;
-  }[];
-}
+import type { RichTaskData } from "@/components/rich-task-view";
 
 export default function TaskPage() {
   const params = useParams();
@@ -55,6 +42,7 @@ export default function TaskPage() {
     }
 
     const fetchTask = async () => {
+      setRichData(null);
       try {
         const taskDoc = await getDoc(doc(db, "tasks", taskId));
         if (taskDoc.exists()) {
@@ -68,7 +56,7 @@ export default function TaskPage() {
               説明: data["説明"],
               必要な知識: data["必要な知識"],
               ロードマップ: data["ロードマップ"],
-              ステップ: data["ステップ"],
+              ステップ: Array.isArray(data["ステップ"]) ? data["ステップ"] : [],
             });
           }
         }

@@ -26,6 +26,7 @@ export default function NewTaskPage() {
     setLoading(true);
     setError(null);
     setAnalyzedTask(null);
+    setExpandedStep(null);
 
     try {
       // Step 1: Fetch GitHub Issue info
@@ -103,6 +104,7 @@ export default function NewTaskPage() {
       const message =
         err instanceof Error ? err.message : "保存に失敗しました";
       setError(message);
+    } finally {
       setSaving(false);
     }
   };
@@ -234,14 +236,20 @@ export default function NewTaskPage() {
                             <span className="text-xs font-semibold text-gray-400">
                               公式教材
                             </span>
-                            <a
-                              href={step.公式教材のリンク}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-blue-500 hover:underline break-all"
-                            >
-                              {step.公式教材のリンク}
-                            </a>
+                            {/^https?:\/\//.test(step.公式教材のリンク) ? (
+                              <a
+                                href={step.公式教材のリンク}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-blue-500 hover:underline break-all"
+                              >
+                                {step.公式教材のリンク}
+                              </a>
+                            ) : (
+                              <span className="text-xs text-gray-500 break-all">
+                                {step.公式教材のリンク}
+                              </span>
+                            )}
                           </div>
                         )}
                         <div className="flex flex-col gap-1">

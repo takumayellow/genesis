@@ -18,6 +18,13 @@ export interface AnalyzedTask {
 }
 
 export async function POST(request: NextRequest) {
+  if (!process.env.GEMINI_API_KEY) {
+    return NextResponse.json(
+      { error: "GEMINI_API_KEY is not configured" },
+      { status: 500 }
+    );
+  }
+
   try {
     const { issueUrl, issueTitle, issueBody } = await request.json();
 
