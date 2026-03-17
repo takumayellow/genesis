@@ -155,7 +155,7 @@ export function RichTaskView({
       <div className="rounded border border-gray-200 bg-white p-6 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-4">
           <h1 className="text-2xl font-bold text-black">{richData.目的}</h1>
-          {richData.issueUrl && (
+          {richData.issueUrl && /^https?:\/\//.test(richData.issueUrl) && (
             <a
               href={richData.issueUrl}
               target="_blank"
